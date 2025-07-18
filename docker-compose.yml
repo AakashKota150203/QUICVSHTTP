@@ -1,0 +1,69 @@
+version: "3"
+
+services:
+  nginx-http2:
+    build: ./nginx
+    ports:
+      - "8443:443"
+    volumes:
+      - ./nginx/certs:/etc/nginx/certs
+      - ./nginx/conf:/etc/nginx/conf.d
+
+  caddy-quic:
+    build: ./caddy
+    ports:
+      - "4433:443/udp"
+      - "4433:443/tcp"
+    volumes:
+      - ./caddy/video:/usr/share/caddy/video
+      - ./nginx/certs:/etc/caddy/certs
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - type: bind
+        source: ./prometheus.yml
+        target: /etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+
+  edge-cdn:
+    image: caddy
+    container_name: edge-cdn
+    ports:
+      - "8081:80"
+    depends_on:
+      - nginx-http2
+      - caddy-quic
+    volumes:
+      - ./edge/Caddyfile:/etc/caddy/Caddyfile
+    cap_add:
+      - NET_ADMIN
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.0
+    container_name: cadvisor
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+
+volumes:
+  grafana-storage:
+

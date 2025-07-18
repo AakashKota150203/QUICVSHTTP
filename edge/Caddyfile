@@ -1,0 +1,22 @@
+:80
+
+@http2 path /http2/*
+handle @http2 {
+    uri strip_prefix /http2
+    reverse_proxy nginx-http2:443 {
+        transport http {
+            tls_insecure_skip_verify
+        }
+    }
+}
+
+@quic path /quic/*
+handle @quic {
+    uri strip_prefix /quic
+    reverse_proxy caddy-quic:443 {
+        transport http {
+            tls_insecure_skip_verify
+        }
+    }
+}
+

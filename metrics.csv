@@ -1,0 +1,12 @@
+HTTP/2,
+time_namelookup: 0.000015 
+time_connect: 0.000000 
+time_appconnect: 0.000000 
+time_starttransfer: 0.000000 
+time_total: 0.000442
+HTTP/3,
+time_namelookup: 0.000016 
+time_connect: 0.000000 
+time_appconnect: 0.000000 
+time_starttransfer: 0.000000 
+time_total: 0.182795

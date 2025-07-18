@@ -1,0 +1,6 @@
+:443 {
+    root * /srv
+    file_server
+    tls /etc/caddy/certs/selfsigned.crt /etc/caddy/certs/selfsigned.key
+    encode gzip
+}
